@@ -1,0 +1,87 @@
+1. 用train_ratings.csv,每100步 取loss画图，bs=256,loss波动 win10上花了3个多小时,50 epochs
+2. 用train_ratings.csv,每100步 bs=1024 2个loss均波动，201上花了将近100分钟 100 epoch
+3. 用train_ratings.csv,每1000步 bs=1024 2个loss均波动 201上花了1个多小时
+4. 用train_ratings.csv,每100步 bs=1024 2个loss均波动 202上花了222分钟
+
+删除了tf中summary的输出
+5. 用ratings.csv,每1000步 bs=1024 201上，reward 未归一化，全为正 86min 波动，感觉在上升
+6. 用ratings.csv,每1000步 bs=1024，reward归一化了，有正有负  202上,297min,beta波动，pi下降
+7. 用train_ratings.csv,每1000 bs=1024,reward 未归一化，全为正，win10，50个epochs,182 min  2个loss都在波动
+8. 用ratings.csv,每1000步 bs=1024，reward归一化了，有正有负  201上 86min  pi的loss大致是下降的，而beta的loss似乎没下降
+9. 用ratings.csv,每1000步 bs=256，reward归一化了，有正有负  201上,pi 能降，beta降不了 181min
+10. 用ratings.csv训练，bs=1024,reward未归一化，win10 ,100 epochs 240min loss在下降，最后为0？把label的信息也加进去了
+
+
+202 num_sampled=10 下降的不是很明显，波动                             pi到50上下，beta到1.5左右 波动
+202 num_sampled=20,下降的可以  loss曲线参考_20，                      pi到50上下，beta到2上下
+
+202 num_sampled=30 效果很差                                         pi到50上下，beta到1.5左右
+201 num_sampled=40,下降的可以                                       pi到50上下，beta到1.5左右
+
+201 num_sampled=50,pi loss下降的不错，loss曲线参考 _50 感觉比20的要好，pi到50上下，beta loss到1上下了
+201 num_sampled=60 效果不错                                         pi到50上下，beta到1.5左右
+202 num_sampled=70 效果不错                                         pi到50上下，beta到1.5上下
+201 num_sampled=80 效果不错                                         pi到50往上，beta到1.5上下
+202 num_sampled=90 效果不错                                         pi到50往上，beta到2上下
+201 num_sampled=100 效果不错                                        pi到50往上，beta到2上下
+201 num_sampled=100 降的不错， 参考_100                              pi到50往上，beta到2上下
+202 num_sampled=110 效果不错                                        pi到60往上，beta到2上下
+201 num_sampled=120 效果不错                                        pi到60上下，beta到2上下
+202 num_sampled=130 效果不错,比120差                                 pi到60往上，beta到2往上
+201 num_sampled=140 效果不错                                        pi到60往上，beta到2往上
+202 num_sampled=150 效果不错,比120差                                 pi到75上下，beta到2往上
+201 num_sampled=160 效果不错                                        pi到75上下，beta到2往上
+202 num_sampled=170 效果不错,比120差                                 pi到75上下，beta到2往上
+201 num_sampled=180 效果不错                                        pi到75上下，beta到2往上
+202 num_sampled=190 效果不错,比120差                                 pi到75上下，beta到2.5上下
+202 num_sampled=200 也降的不错，loss曲线参考_200                      pi到75上下，beta在2.5上下
+201 num_sampled=250 效果不错                                        pi到75往上，beta到2.5往上
+201 num_sampled=500 降的很好                                        pi到100往上，beta到3往上
+202 num_sampled=1000 没之前降的好                                    pi到150往下，beta到4往上
+总结:20-100之间都可以，50,60,70最好，20-100倍之间，当前来说，50是最佳的
+
+
+201 {"pi": "pi", "beta": "beta"} 1000,pi loos用的ce_loss,loss曲线请参考 (11)
+202 {"pi": "pi", "beta": "beta"} 1000,pi loss用的是pi_log_prob loss曲线请参考(12)
+
+202 {"pi": "pi", "beta": "beta"} 200,pi loos用的ce_loss loss曲线参考14
+201 {"pi": "pi", "beta": "beta"} 200,pi loss用的是pi_log_prob loss曲线参考(13)
+总结:loss还是用ce_loss比较好，至于是pi还是beta来选动作似乎差别不大。
+
+202 {"pi": "beta", "beta": "beta"} pi loss用的ce_loss_main，loss曲线参考15
+201 {"pi": "beta", "beta": "beta"} pi loss 用的pi_log_prob,loss曲线参考16
+
+TopKReinforce.py
+201 {"pi": "beta", "beta": "beta"} bs=256 num_sampled=25 loss的下降很不理想 loss曲线参考(6)
+201 {"pi": "beta", "beta": "beta"} bs=256 num_sampled=50
+202 {"pi": "beta", "beta": "beta"} bs=512 num_sampled=50 loss下降不理想 loss曲线参考(7)
+
+为什么现在再跑TopKReinforce_rnn.py文件，pi 的loss降不到60以下了呢
+
+20m的数据集训练一个epoch的情况
+model training end~~~~~~2020-12-03 12:39:45
+time cost :18.89916648864746 m
+Recall@20: 0.05848778735721344  MRR@20: 0.008861360753742697
+evaluate_sessions_batch !!!! end
+time cost :12.838559818267822 m
+
+ml-latest.csv 4096/120
+start model training.......2020-12-01 17:55:19
+model training end~~~~~~2020-12-03 22:52:14
+time cost :3176.9114406228064 m
+
+20m top1 4096/120
+model training end~~~~~~2020-12-04 05:05:39
+time cost :970.1723783532778 m
+evaluating..................
+Recall@20: 0.19942149398322467  MRR@20: 0.052183558844622564
+evaluate_sessions_batch !!!! end
+evaluation time cost :22.557967189947764 m
+
+1m top1 4096/120
+model training end~~~~~~2020-12-04 09:23:40
+time cost :1.194666830698649 m
+evaluating..................
+Recall@20: 0.12914818079781878  MRR@20: 0.03420395651361243
+evaluate_sessions_batch !!!! end
+evaluation time cost :0.6646590431531271 m

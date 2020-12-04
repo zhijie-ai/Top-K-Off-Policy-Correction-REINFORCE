@@ -1,0 +1,189 @@
+backend: tensorflow
+class_name: Model
+config:
+  input_layers:
+  - [history, 0, 0]
+  - [action, 0, 0]
+  layers:
+  - class_name: InputLayer
+    config:
+      batch_input_shape: !!python/tuple [null, 1]
+      dtype: float32
+      name: action
+      sparse: false
+    inbound_nodes: []
+    name: action
+  - class_name: InputLayer
+    config:
+      batch_input_shape: !!python/tuple [null, 15]
+      dtype: float32
+      name: history
+      sparse: false
+    inbound_nodes: []
+    name: history
+  - class_name: Embedding
+    config:
+      activity_regularizer: null
+      batch_input_shape: !!python/tuple [null, 15]
+      dtype: float32
+      embeddings_constraint: null
+      embeddings_initializer:
+        class_name: RandomUniform
+        config: {dtype: float32, maxval: 0.05, minval: -0.05, seed: null}
+      embeddings_regularizer: null
+      input_dim: 6040
+      input_length: 15
+      mask_zero: false
+      name: embedding
+      output_dim: 64
+      trainable: true
+    inbound_nodes:
+    - - - action
+        - 0
+        - 0
+        - {}
+    name: embedding
+  - class_name: Embedding
+    config:
+      activity_regularizer: null
+      batch_input_shape: !!python/tuple [null, 15]
+      dtype: float32
+      embeddings_constraint: null
+      embeddings_initializer:
+        class_name: RandomUniform
+        config: {dtype: float32, maxval: 0.05, minval: -0.05, seed: null}
+      embeddings_regularizer: null
+      input_dim: 6040
+      input_length: 15
+      mask_zero: false
+      name: embedding_1
+      output_dim: 64
+      trainable: true
+    inbound_nodes:
+    - - - history
+        - 0
+        - 0
+        - {}
+    name: embedding_1
+  - class_name: TensorFlowOpLayer
+    config:
+      constants: {}
+      dtype: null
+      name: tf_op_layer_Squeeze
+      node_def: !!binary |
+        CgdTcXVlZXplEgdTcXVlZXplGiVlbWJlZGRpbmcvZW1iZWRkaW5nX2xvb2t1cC9JZGVudGl0eV8x
+        KhUKDHNxdWVlemVfZGltcxIFCgMaAQEqBwoBVBICMAE=
+      trainable: true
+    inbound_nodes:
+    - - - embedding
+        - 0
+        - 0
+        - {}
+    name: tf_op_layer_Squeeze
+  - class_name: LSTM
+    config:
+      activation: tanh
+      activity_regularizer: null
+      bias_constraint: null
+      bias_initializer:
+        class_name: Zeros
+        config: {dtype: float32}
+      bias_regularizer: null
+      dropout: 0.0
+      dtype: float32
+      go_backwards: false
+      implementation: 1
+      kernel_constraint: null
+      kernel_initializer:
+        class_name: GlorotUniform
+        config: {dtype: float32, seed: null}
+      kernel_regularizer: null
+      name: lstm
+      recurrent_activation: hard_sigmoid
+      recurrent_constraint: null
+      recurrent_dropout: 0.0
+      recurrent_initializer:
+        class_name: Orthogonal
+        config: {dtype: float32, gain: 1.0, seed: null}
+      recurrent_regularizer: null
+      return_sequences: false
+      return_state: false
+      stateful: false
+      time_major: false
+      trainable: true
+      unit_forget_bias: true
+      units: 128
+      unroll: false
+      use_bias: true
+    inbound_nodes:
+    - - - embedding_1
+        - 0
+        - 0
+        - {}
+    name: lstm
+  - class_name: Concatenate
+    config: {axis: -1, dtype: float32, name: concatenate, trainable: true}
+    inbound_nodes:
+    - - - tf_op_layer_Squeeze
+        - 0
+        - 0
+        - &id001 {}
+      - - lstm
+        - 0
+        - 0
+        - *id001
+    name: concatenate
+  - class_name: Dense
+    config:
+      activation: linear
+      activity_regularizer: null
+      bias_constraint: null
+      bias_initializer:
+        class_name: Zeros
+        config: {dtype: float32}
+      bias_regularizer: null
+      dtype: float32
+      kernel_constraint: null
+      kernel_initializer:
+        class_name: GlorotUniform
+        config: {dtype: float32, seed: null}
+      kernel_regularizer: null
+      name: dense
+      trainable: true
+      units: 64
+      use_bias: true
+    inbound_nodes:
+    - - - concatenate
+        - 0
+        - 0
+        - {}
+    name: dense
+  - class_name: Dense
+    config:
+      activation: linear
+      activity_regularizer: null
+      bias_constraint: null
+      bias_initializer:
+        class_name: Zeros
+        config: {dtype: float32}
+      bias_regularizer: null
+      dtype: float32
+      kernel_constraint: null
+      kernel_initializer:
+        class_name: GlorotUniform
+        config: {dtype: float32, seed: null}
+      kernel_regularizer: null
+      name: dense_1
+      trainable: true
+      units: 1
+      use_bias: true
+    inbound_nodes:
+    - - - dense
+        - 0
+        - 0
+        - {}
+    name: dense_1
+  name: reward_model
+  output_layers:
+  - [dense_1, 0, 0]
+keras_version: 2.2.4-tf

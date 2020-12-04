@@ -1,0 +1,5 @@
+1. 模型加载时，如果是自定义模型的方式，通过model_from_yaml类似的方式加载会报错，所以最好将模型重新定义一遍再加载模型权重
+2. 如果是类似Reward_keras.py文件中类似的模型定义方式，可以通过model_from_yaml来加载网络结构，再用load_weights来加载权重
+3. 自定义模型加载权重时，为啥既可以用weights2.best.hdf5 也可以用weights3.best.hdf5,同样，先用model_keras加载网络结构，
+    也可以用load_weights加载自定义Model的方式的权重或者Reward_keras.py文件的训练的权重，应该是他们的参数是一样的。
+    也就是说，只要网络结构加载好了，权重只要一样都是可以load的，因为他们的参数是一样的。
